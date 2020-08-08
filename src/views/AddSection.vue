@@ -1,6 +1,6 @@
 <template>
     <div class="add-doc">
-        <div class="error-popup" v-if='$v.title.$dirty && !$v.title.required || $v.content.$dirty && !$v.content.required'>
+        <div class="error-popup" v-if='$v.title.$dirty && !$v.title.required'>
             <i class="fas fa-exclamation-triangle err-icon"></i>
            <p class="error-text">Не указан заголовок или раздел</p>
         </div>
@@ -12,15 +12,10 @@
                         <input type="text" placeholder="Контакты" class="modal-doc-input">
                     </div>
                 </div>
-                <div class="doc-tags" v-click-outside='tagsHide' @click='tags = true'>
-                    <i class="fas fa-tag header-icon"></i> <span class="header-items-text">Теги</span>
-                    <div class="modal-doc modal-tags" v-show='tags'>
-                        <input type="text" placeholder="Введите название тега" class="modal-doc-input">
-                    </div>
-                </div>
+                
             </div>
             <div class="right-part">
-                <button class="doc-btn publish-btn" @click="postContent">Опубиковать</button>
+                <button class="doc-btn publish-btn" @click="postContent" >Опубиковать</button>
                 <button class="cancel-btn" @click='cancel'>Отменить</button>
                 <i class="fas fa-ellipsis-h doc-menu"></i>
             </div>
@@ -30,36 +25,51 @@
                 <p class="choose-title" @click = 'choose = true'>{{currentName === '' ? 'Выбор раздела' : currentName}}</p>
                 <div class="sec-wrapper" v-show='choose'>
                     <div class="dropdown-section-wrapper section-position" >
-                        <input type="text" class="choose-section modal-doc-input" placeholder="Название раздела">
+                        <input type="text" class="choose-section modal-doc-input" v-model='searchSection' placeholder="Название раздела">
                     </div>
                     <div class="choose-panel">
-                        <div class="choose-item-wrapper"
-                            v-for = '(section, index) in sections'
-                            :key = '`section${index}`'
-                            
-                        >
-                            <div class="choose-item"
-                                @click="select(section)"
-                            >
-                                <p>{{section.name}}</p>
-                            </div>
-                            <div class="wrapper-item"
-                                v-for = '(sectionChild, index) in section.children'
-                                :key = '`sectionChild${index}`'
+                        <div class="find-wrapper" v-if='searchSection'>
+                            <div class="choose-item-wrapper"
+                                v-for='(separateSec, index) in filteredSections'
+                                :key ='`find${index}`'
                                 
                             >
                                 <div class="choose-item"
-                                    @click="select(sectionChild)"
+                                    @click="select(separateSec)"
                                 >
-                                    <p class="sec-child">- {{sectionChild.name}}</p>
+                                    <p>{{separateSec.name}}</p>
                                 </div>
+                            </div>
+                        </div>
 
+                        <div class="find-wrapper" v-else-if = '!searchSection'>
+                            <div class="choose-item-wrapper"
+                                v-for = '(section, index) in sections'
+                                :key = '`section${index}`'
+                            >
                                 <div class="choose-item"
-                                    v-for = '(level, index) in sectionChild.children'
-                                    :key = '`level${index}`'
-                                    @click="select(level)"
+                                    @click="select(section)"
                                 >
-                                    <p class="lev-child">-- {{level.name}}</p>
+                                    <p>{{section.name}}</p>
+                                </div>
+                                <div class="wrapper-item"
+                                    v-for = '(sectionChild, index) in section.children'
+                                    :key = '`sectionChild${index}`'
+                                    
+                                >
+                                    <div class="choose-item"
+                                        @click="select(sectionChild)"
+                                    >
+                                        <p class="sec-child">- {{sectionChild.name}}</p>
+                                    </div>
+
+                                    <div class="choose-item"
+                                        v-for = '(level, index) in sectionChild.children'
+                                        :key = '`level${index}`'
+                                        @click="select(level)"
+                                    >
+                                        <p class="lev-child">-- {{level.name}}</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -67,10 +77,11 @@
                 </div>
                 
             </div>
-            <input type="text" v-model="title" class="header-input" placeholder="Заголовок статьи">
-            <vue-editor v-model="content" class='doc-editor'></vue-editor>
+            <input type="text" v-model="title" class="header-input" placeholder="Заголовок раздела">
+
         </div>
-        
+        <editor ref="editor" :config="config" :initialized="onInitialized" class="doc-editor" />
+
         <Loader v-show="load" />
 
     </div>
@@ -79,52 +90,137 @@
 <script>
 
 import ClickOutside from 'vue-click-outside'
-import { VueEditor } from 'vue2-editor'
 import {mapGetters} from 'vuex'
 import { required } from 'vuelidate/lib/validators'
 import Loader from '@/components/Loader'
 
+import {Editor} from 'vue-editor-js'
+import List from '@editorjs/list'
+import Header from '@editorjs/header'
+import SimpleImage from '@editorjs/simple-image'
+import CodeTool from '@editorjs/code'
+import Delimiter from '@editorjs/delimiter'
+import Quote from '@editorjs/quote'
+import Checklist from '@editorjs/checklist'
+import Table from '@editorjs/table'
+import Warning from '@editorjs/warning'
+import RawTool from '@editorjs/raw'
+import ImageTool from '@editorjs/image'
+
+
 export default {
+    components: {
+        Loader, Editor
+    },
     data: () => ({
-        content: '',
+        searchSection: '',
         title: '',
         nowDate: '',
         authorName: '',
         authorSurname: '',
         access: false,
-        tags: false,
         load: false,
         choose: false,
         section: '',
         sections: [],
-        currentName: ''
+        currentName: '',
+        tag: '',
+        separateSections: [],
+
+        config: {
+            tools: {
+                list: {
+                    class: List,
+                    inlineToolbar: true
+                },
+                header: {
+                    class: Header,
+                    config: {
+                        placeholder: 'Enter a header',
+                        levels: [1, 2, 3, 4, 5, 6],
+                        defaultLevel: 3
+                    }
+                },
+                image: {
+                    class: ImageTool,
+                    config: {
+                        endpoints: {
+                        byFile: '', 
+                        byUrl: '',
+                        }
+                    }
+                },
+                code: {
+                    class: CodeTool
+                },
+                table: {
+                    class: Table,
+                    inlineToolbar: true,
+                    config: {
+                    rows: 2,
+                    cols: 3,
+                    },
+                },
+                checklist: {
+                    class: Checklist,
+                },
+                warning: {
+                    class: Warning,
+                    inlineToolbar: true,
+                    shortcut: 'CMD+SHIFT+W',
+                    config: {
+                    titlePlaceholder: 'Title',
+                    messagePlaceholder: 'Message',
+                    },
+                },
+                raw: RawTool,
+                quote: {
+                    class: Quote,
+                    inlineToolbar: true,
+                    shortcut: 'CMD+SHIFT+O',
+                    config: {
+                    quotePlaceholder: 'Enter a quote',
+                    captionPlaceholder: 'Quote\'s author',
+                    },
+                },
+                delimiter: Delimiter,
+                onChange: (args) => {
+                    console.log('Now I know that Editor\'s content changed!')
+                }
+
+            }
+        }
     }),
     validations: {
-        content: {required},
         title: {required}
     },
-    components: {
-        VueEditor, Loader
-    },
+   
     directives: {
      ClickOutside
+    },
+    computed: {
+        filteredSections(){
+            const text = this.searchSection
+            return this.separateSections.filter(elem => {
+                return elem.name.toLowerCase().includes(text.toLowerCase())
+            })
+        }
     },
     mounted() {
         this.sidebarUpdate()
     },
     methods: {
+        onInitialized (editor) {
+            console.log(editor)
+        },
         select({id, name}) {
             
             this.currentName = name
             this.section = id
 
-            console.log(this.section);
+            console.log(id)
+            this.searchSection = ''
             this.choose = false
-            
-
-        },
-        tagsHide(){
-            this.tags = false
         },
         accessHide(){
             this.access = false
@@ -136,21 +232,26 @@ export default {
             }
             if (this.section === ''){
                 return
-            }
+            } 
+            const editorData = await this.$refs.editor.state.editor.save()
             
             const formData = {
                 "name": this.title,
                 "code": "",
                 "images": "",
-                "section_id": this.section.toString(),
-                "description": this.content
+                "section": this.section,
+                "blocks": JSON.stringify(editorData.blocks)
             }
             console.log(formData);
             await this.$store.dispatch('ADD_SECTION', formData)
+
+            this.$router.push('/account')
         },
         async sidebarUpdate(){
             this.sections = []
+            this.separateSections = []
             const array = await this.$store.dispatch('SECTIONS')
+            this.separateSections = array
             array.forEach(async element => {
                 if (element.level === 1) {
                     element.children = await this.$store.dispatch('SECTION_SIDEBAR', element.id)
@@ -160,12 +261,11 @@ export default {
                     this.sections.push (element)
                 }
             })
-
-            console.log(this.sections)
+            console.log(this.separateSections)
         },
         cancel(){
             alert ('Изменения не сохранятся, вы точно хотите выйти?')
-            this.$router.push('/account/works')
+            this.$router.push('/account')
         },
         addSection(secName) {
             this.section = secName
@@ -179,6 +279,38 @@ export default {
 </script>
 
 <style lang="scss">
+.clear-tag {
+    color: #999;
+    font-size: 12px;
+    transition: .5s;
+
+    &:hover { 
+        color: #0e65dd;
+    }
+}
+.icon-tag {
+    margin-right: 15px;
+    color: #999;
+}
+.current-tag-name {
+    margin-right: 15px;
+}
+.current-tags {
+    max-width: 380px;
+    display: flex;
+    flex-wrap: wrap;
+}
+.tag-item{
+    height: 35px;
+    border: 1px solid #9dbbe4;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    margin-bottom: 20px;
+    margin-right: 10px;
+}
 .lev-child {
     padding-left: 40px;
 }
@@ -194,6 +326,28 @@ export default {
         color: #0b55bb;
     }
 }
+.tag-current {
+    padding: 15px 10px;
+    border-radius: 2px;
+    transition: .5s;
+
+    &:hover {
+        background-color: rgba(14, 90, 197, 0.05);
+    }
+}
+.current-tag-wrapper {
+    padding-bottom: 15px;
+}
+.tags-field {
+    width: 380px;
+    min-height: 70px;
+    box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.08);
+    z-index: 99;
+    padding: 30px;
+    background-color: #fff;
+    position: absolute;
+    top: 117px;
+}
 .modal-doc {
     display: flex;
     align-items: center;
@@ -201,6 +355,7 @@ export default {
     min-height: 70px;
     box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.08);
     top: 40px;
+    background-color: #fff;
     position: absolute;
     z-index: 99;
 
@@ -235,6 +390,8 @@ export default {
 }
 .doc-editor {
     margin-bottom: 100px;
+    width: 900px;
+    margin: 0 auto;
 }
 .header-input {
     border: none;
@@ -250,7 +407,7 @@ export default {
     }
 }
 .doc-main-content {
-    width: 1100px;
+    width: 900px;
     margin: 0 auto;
 }
 .doc-menu {
@@ -366,4 +523,5 @@ export default {
     position: relative;
     cursor: pointer;
 }
+
 </style>

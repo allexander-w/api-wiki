@@ -64,21 +64,35 @@
                 Регистрация
             </button>
         </form>
+
+        <transition name="fade">
+            <Message :message='message' v-show='!status' />
+        </transition>
+
+        <Loader v-show='load' />
     </div>
 </template>
 
 <script>
 import { required, minLength, email } from 'vuelidate/lib/validators'
+import Message from '@/components/Message'
+import Loader from '@/components/Loader'
 
 export default {
     name: 'Register',
     data: ()=> ({
+        message: 'Данный e-mail уже существует',
         email: '',
         password: '',
         name: '',
         surname: '',
-        passConf: ''
+        passConf: '',
+        status: true,
+        load: false
     }),
+    components: {
+        Message, Loader
+    },
     validations: {
         email: {required, email},
         password: {required, minLength: minLength(6)},
@@ -108,11 +122,23 @@ export default {
                 name: this.name,
                 surname: this.surname,
                 passConf: this.passConf
+            }   
+
+            this.load = true
+            
+            this.status = await this.$store.dispatch('SIGN_UP', formData)
+            if (this.status) {
+                 this.$router.push('/add-company')
+                 this.load = false
+            } else {
+                this.load = false
+                setTimeout(()=> {
+                    this.status = true
+                }, 2500)
             }
-            try {
-                await this.$store.dispatch('SIGN_UP', formData)
-                this.$router.push('/add-company')
-            } catch (e) {}
+            this.load = false
+            
+            
             
         },
         changeView(data){

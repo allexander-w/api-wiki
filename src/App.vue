@@ -9,10 +9,11 @@ import StartLayout from '@/layouts/StartLayout'
 import AuthLayout from '@/layouts/AuthLayout'
 import MainLayout from '@/layouts/MainLayout'
 import EditorLayout from '@/layouts/EditorLayout'
+import NotFound from '@/layouts/NotFound'
 
 export default {
   name: 'App',
-  components: {StartLayout,AuthLayout,MainLayout,EditorLayout},
+  components: {StartLayout,AuthLayout,MainLayout,EditorLayout,NotFound},
   computed: {
     layout(){
       return this.$route.meta.layout
@@ -30,6 +31,7 @@ export default {
 }
 body {
   font-family: 'Roboto', sans-serif;
+  overflow-x: hidden;
 }
 a {
   text-decoration: none;
@@ -37,10 +39,9 @@ a {
 p {
   color: #363636;
   font-size: 14px;
+  line-height: 20px;
 }
-ul,li {
-  list-style: none;
-}
+
 .icon {
   color: #0e65dd;
 }
@@ -155,8 +156,7 @@ table {
   font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
   font-size: 14px;
   background: white;
-  min-width: 120%;
-  max-width: 190%;
+  min-width: 900px;
   border-collapse: collapse;
   text-align: left;
 }
@@ -289,4 +289,89 @@ td {
 .work-info-span {
     color: #999999;
 }
+
+ol.article-list {
+    list-style-type: decimal;
+    margin-block-start: 30px ;
+    margin-block-end: 30px;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
+    padding-inline-start: 40px;
+}
+ul.article-list {
+    list-style-type: disc;
+    margin-block-start: 30px ;
+    margin-block-end: 30px;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
+    padding-inline-start: 40px;
+}
+.article-code {
+    box-sizing: border-box;
+    padding: 40px;
+    border-radius: 2px;
+    background-color: #f7fafe;
+    margin-bottom: 40px;
+}
+.article-code__content {
+    font: "Menlo";
+    color: #383838;
+    display: inline-block;
+}
+pre, code {
+    overflow: auto;
+    font-family: monospace, monospace;
+    white-space: pre;
+}
+ul, ol {
+    font-size: 14px;
+    color: #383838;
+}
+.block-warning {
+  font-size: 14px;
+    color: #383838;
+}
+.article-quote {
+    position: relative;
+    padding-left: 20px;
+    font-size: 14px;
+
+    &:before {
+      content: '';
+      position: absolute;
+      left: -50px;
+      top: -10px;
+      display: block;
+      background-image: url(data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2241%22%20height%3D%2233%22%20viewBox%3D%220%200%2041%2033%22%3E%0A%20%20%20%20%3Cpath%20fill%3D%22%23CEDDF1%22%20fill-rule%3D%22nonzero%22%20d%3D%22M40.563%209.154c0%206.641-1.392%2011.939-4.175%2015.894-2.784%203.955-7.056%206.518-12.818%207.69v-7.177c2.344-1.27%203.76-3.174%204.248-5.713H23.57V.218h16.992v8.936zm-22.706%200c0%206.641-1.391%2011.939-4.174%2015.894-2.784%203.955-7.056%206.518-12.818%207.69v-7.177c1.465-.782%202.49-1.563%203.076-2.344.586-.781.977-1.904%201.172-3.37H.865V.22h16.992v8.935z%22%2F%3E%0A%3C%2Fsvg%3E%0A);
+      width: 50px;
+      height: 60px;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+}
+blockquote {
+    display: block;
+    margin-block-start: 60px;
+    margin-block-end: 60px;
+    margin-inline-start: 40px;
+    margin-inline-end: 40px;
+}
+.article-image img{
+  max-width: 600px;
+}
+.ce-block__content {
+    max-width: 950px;
+    width: 880px;
+
+}
+.ce-paragraph {
+    width: 850px;
+}
+.ce-toolbar__plus {
+    left: -150px;
+}
+.ce-toolbox {
+  left: -115px
+}
+
 </style>

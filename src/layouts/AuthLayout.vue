@@ -2,7 +2,7 @@
     <div class="auth-page">
         <div class="header">
             <div class="logo">
-                logo
+                <img src="https://itl.wiki/assets/img/logo.svg" alt="logo">
             </div>
         </div>
         <router-view />
@@ -21,5 +21,6 @@
 }
 .logo {
     position: fixed;
+    padding: 23px;
 }
 </style>

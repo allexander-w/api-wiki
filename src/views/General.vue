@@ -53,7 +53,8 @@ export default {
         companyName: '',
         checkCode: false,
         validate: false,
-        load: false
+        load: false,
+        teamInfo: {}
     }),
     validations: {
         domen: {required, minLength: minLength(6)},
@@ -62,7 +63,19 @@ export default {
     components: {
         Loader
     },
+    async mounted(){
+        await this.updateData()
+    },
     methods: {
+        async updateData(){
+            this.load = true
+            this.teamInfo = await this.$store.dispatch('COMPANY_VIEW')
+
+            this.domen = this.teamInfo.code
+            this.companyName = this.teamInfo.name
+
+            this.load = false
+        },
         async check(){
             if (this.$v.$invalid){
                 this.$v.$touch()

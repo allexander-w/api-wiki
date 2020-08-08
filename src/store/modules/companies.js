@@ -1,5 +1,27 @@
 export default {
     actions: {
+        async COMPANY_VIEW({}){
+            const token = localStorage.getItem('token')
+            const team_id = localStorage.getItem('teamId')
+            const url = new URL(
+                `https://api.itl.wiki/team/${team_id}`
+            )
+
+            let headers = {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Authorization": "Bearer " + token,
+            }
+
+            const res = await fetch(url, {
+                method: "GET",
+                headers
+            })
+            const data = await res.json()
+            console.log(data)
+
+            return data.data.team
+        },
         async EDIT_TEAM({dispatch}, {code,name}){
             const token = localStorage.getItem('token')
             const team_id = localStorage.getItem('teamId')

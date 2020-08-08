@@ -31,10 +31,14 @@
              ></i> <span class="sidebar-doc"> {{section.name}}</span>
             </div>
         </div>
+
+        <Loader v-show='load' />
     </div> 
 </template>
 
 <script>
+import Loader from '@/components/Loader'
+
 export default {
     data: ()=> ({
         menu: [
@@ -42,9 +46,14 @@ export default {
             {icon: 'far fa-file-alt', title: 'Ваши работы', route: '/account/works'},
             {icon: 'far fa-bookmark', title: 'Закладки', route: '/account/bookmarks'}
         ],
-        sections: []
+        sections: [],
+        load: false
     }),
+    components: {
+        Loader
+    },
     async mounted(){
+        this.load = true
         const token = localStorage.getItem('token')
         const team_id = localStorage.getItem('teamId')
 
@@ -64,13 +73,18 @@ export default {
         })
             .then(response => response.json())
             .then(json => {
-                //console.log(json.data)
-                json.data.forEach(element => {
+                if (json.data) {
+                    json.data.forEach(element => {
                     if (element.level === 1) {
                         this.sections.push(element)
                     }
                 })
+                }
             })
+            .then (()=> {
+                this.load = false
+            })
+        
     },
     methods: {
         async getSecId(id){

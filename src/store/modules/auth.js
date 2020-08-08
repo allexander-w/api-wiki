@@ -25,10 +25,15 @@ export default {
                 body: JSON.stringify(body)
             })
             const data = await res.json()
-            
-            localStorage.setItem('token', data.data.token)
+            console.log(data)
 
-            console.log(data.data.token)
+            if (data.status === 'error') {
+                return false
+            } else {
+                localStorage.setItem('token', data.data.token)
+                console.log(data.data.token)
+                return true
+            }
         },
         async SIGN_UP({dispatch}, formData) {
 
@@ -58,11 +63,11 @@ export default {
             const data = await res.json()
             console.log(data)
             if (data.status === 'error') {
-                return
+                return false
+            } else {
+                await dispatch('SIGN_IN', formData)
+                return true
             }
-
-            await dispatch('SIGN_IN', formData)
-
         },
         GET_TOKEN({dispatch}){
             const token = localStorage.getItem('token')

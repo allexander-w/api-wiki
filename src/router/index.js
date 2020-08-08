@@ -122,6 +122,15 @@ const router = new VueRouter({
       component: () => import('../views/AddSection.vue')
     },
     {
+      path: '/account/add-document',
+      name: 'AddArticle',
+      meta: {
+        layout: 'EditorLayout',
+        auth: true
+      },
+      component: () => import('../views/AddArticle.vue')
+    },
+    {
       path: '/sign-up/add-company',
       name: 'AddCompanySignUp',
       meta: {
@@ -129,6 +138,31 @@ const router = new VueRouter({
         auth: true
       },
       component: () => import('../views/AddEmployeesSignUp.vue')
+    },
+    {
+      path: '/account/works',
+      name: 'Works',
+      meta: {
+        layout: 'MainLayout',
+        auth: true
+      },
+      component: () => import('../views/Works.vue')
+    },
+    {
+      path: '/account/integrations',
+      name: 'Integrations',
+      meta: {
+        layout: 'MainLayout',
+        auth: true
+      },
+      component: () => import('../views/Integrations.vue')
+    },
+    { path: '*', 
+      meta: {
+        layout: 'NotFound',
+        auth: false
+      },
+      component: () => import('../layouts/NotFound.vue') 
     }
   ]
 })
@@ -140,6 +174,10 @@ router.beforeEach((to,from,next)=>{
   if (user === '' && isAuth){
     next('/sign-in?message=authRequired')
   } else {next()}
+
+  if (user != '' && to.path === '/sign-in' || user != '' && to.path === '/register'){
+    next('/account?message=authTrue')
+  }
 })
 
 export default router

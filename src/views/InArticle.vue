@@ -3,7 +3,7 @@
         <div class="current-doc-header">
             <div class="breadcrumbs">
                 <router-link to='/account' class="br-general br-link">
-                    {{ARTICLE.article.section.name}}
+                    {{ARTICLE.article.name}}
                 </router-link>
             </div>
             <div class="cd-header-btns">
@@ -22,7 +22,8 @@
             <p class="cd-date">Обновлено: <span>{{ARTICLE.article.created_at}}</span></p>
         </div>
         
-        <div class="content-in-doc" v-html='ARTICLE.article.content'></div>
+        <div class="content-in-doc" v-html="ARTICLE.article.content">
+        </div>
 
         <div class="cd-like">
             <i class="cd-like-icon fas fa-thumbs-up"></i> <span>Нравится</span>
@@ -57,29 +58,37 @@
                 </div>
 
             </div>
-            
-            <div class="add-comment">
-                <input type="text" v-model='content' placeholder="Добавить комментарий" class='add-com-input'>
-                <button class="blue-button send-btn" >Отправить</button>
-            </div>
         </div>
+        <div class="add-comment-field">
+            <div class="input-wrapper">
+                <input type="text" v-model='content' placeholder="Добавить комментарий" class="add-comment-input">
+            </div>
+            <button class="blue-button send-btn" >Отправить</button>
+        </div>
+
+        <Loader v-show='load' />
     </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
+import Loader from '@/components/Loader'
+
 export default {
-    name: 'InArticle',
     data: () => ({
         load: false,
         content: ''
     }),
+    components: {
+        Loader
+    },
     computed: {
         ...mapGetters(['ARTICLE'])
     },
     async mounted() {
+        this.load = true
         this.updateArticle()
-        console.log(this.$route.params.articleId)
+        this.load = false 
     },
     methods: {
         async updateArticle(){
@@ -98,7 +107,7 @@ export default {
     font-size: 16px;
     color: #b5ccea;
     transition: .25s;
-
+    
     &:hover {
         color: #0e65dd;
     }
@@ -172,6 +181,7 @@ export default {
 }
 .document-information {
     margin: 0 0 0 50px;
+
 }
 
 .comments-wrapper {
@@ -182,11 +192,11 @@ export default {
     height: 36px;
     padding: 0 5px;
 
-    position: absolute;
-    right: 0;
-    top: 70px;
+    margin-left: 698px;
+    margin-top: 20px;
 }
-.add-com-input {
+
+.add-comment-input {
     width: 800px;
     padding: 20px;
     outline: none;
@@ -194,10 +204,9 @@ export default {
 
     border-bottom: 1px solid #e1ecfc;
 }
-.add-comment {
+.add-comment-field {
     margin: 50px 0 100px;
     width: 800px;
-    position: relative;
 }
 .com-like-panel {
     span {

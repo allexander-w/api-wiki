@@ -30,7 +30,6 @@
             <tr
                 v-for='(employee, index) in employees'
                 :key='index'
-                @click = 'deleteUser(employee.id)'
             >
                 <td>
                     <div class="user-table">
@@ -53,7 +52,7 @@
                     Выдан доступ
                 </td>
                 <td>
-                    Выбор
+                    <SelectRole :roles = 'employee.roles' :userId = 'employee.id' />
                 </td>
             </tr>
         </table>
@@ -64,6 +63,8 @@
 
 <script>
 import Loader from '@/components/Loader'
+import SelectRole from '@/components/SelectRole'
+
 export default {
     name: 'Employees',
     data: () => ({
@@ -71,7 +72,7 @@ export default {
         load: false
     }),
     components: {
-        Loader
+        Loader, SelectRole
     },
     async mounted(){
         this.load = true

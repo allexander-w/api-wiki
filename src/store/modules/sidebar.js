@@ -6,7 +6,7 @@ export default {
         homeBar: [
             {id: 1, name: 'home', component: 'SidebarHome'},
             {id: 2, name: 'plus', component: 'SidebarAdd'},
-            {id: 3, name: 'search', component: 'SBSearch'}
+            {id: 3, name: 'search', component: 'SEARCH'}
         ],
         homeBarWithoutCompany: [
             {id: 1, name: 'home', component: 'SidebarUser'}
@@ -27,6 +27,7 @@ export default {
     },
     mutations: {
         CHANGE_SIDEBAR (state, data){
+           
             state.currentMenu = data
         },
         HOME_NAVBAR(state, bool) {
@@ -37,6 +38,35 @@ export default {
         }
     },
     actions: {
+        async SEARCH_ALL({}, phrase){
+            const token = localStorage.getItem('token')
+            const team_id = localStorage.getItem('teamId')
+
+            const url = new URL(
+                `https://api.itl.wiki/team/${team_id}/search`
+            );
+            
+            let headers = {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Authorization": "Bearer " + token,
+            };
+            
+            let body = {
+                query: phrase,
+                types: "all"
+            }
+            
+            const res = await fetch(url, {
+                method: "POST",
+                headers: headers,
+                body: JSON.stringify(body)
+            })
+
+            const data = await res.json()
+            console.log (data.data.results)
+            return data.data.results
+        },
         GET_SIDEBAR_HOME({commit}){
             const role = localStorage.getItem('role')
             const team_id = localStorage.getItem('teamId')

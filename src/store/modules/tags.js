@@ -1,75 +1,84 @@
-export default {
+export default { 
     actions: {
-        async CHANGE_ROLE ({}, body){
-            const team_id = localStorage.getItem('teamId')
+        async GET_TAGS ({}){
             const token = localStorage.getItem('token')
+            const team_id = localStorage.getItem('teamId')
 
             const url = new URL(
-                `https://api.itl.wiki/team/${team_id}/employees/role/change`
-            );
+                `https://api.itl.wiki/team/${team_id}/settings/tags`
+            )
 
             let headers = {
                 "Content-Type": "application/json",
                 "Accept": "application/json",
-                "Authorization": "Bearer " + token
+                "Authorization": "Bearer " + token,
             }
 
-            const res = await fetch(url, {
-                method: "POST",
-                headers,
-                body: JSON.stringify(body)
-            })
-            
-            const data = await res.json()
-        },
-        async ADD_EMPLOYEE ({dispatch}, {emails, attachable}){
-            const team_id = localStorage.getItem('teamId')
-            const token = localStorage.getItem('token')
-
-            const url = new URL(
-                `https://api.itl.wiki/team/${team_id}/employees/add`
-            );
-
-            let headers = {
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-                "Authorization": "Bearer " + token
-            }
-            const body = {
-                emails,
-                attachable
-            }
-
-            const res = await fetch(url, {
-                method: "POST",
-                headers,
-                body: JSON.stringify(body)
-            })
-            
-            const data = await res.json()
-        },
-        async GET_EMPLOYEES({dispatch}){
-            const team_id = localStorage.getItem('teamId')
-            const token = localStorage.getItem('token')
-
-            const url = new URL(
-                `https://api.itl.wiki/team/${team_id}/employees`
-            );
-
-            let headers = {
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-                "Authorization": "Bearer " + token
+            let body = {
+                name: 'newTag'
             }
 
             const res = await fetch(url, {
                 method: "GET",
                 headers
             })
-            
+
             const data = await res.json()
-            
-            return data.data.employees
+            return data.data
+        },
+        async FIND_TAG ({}, phrase){
+            const token = localStorage.getItem('token')
+            const team_id = localStorage.getItem('teamId')
+
+            const url = new URL(
+                `https://api.itl.wiki/team/${team_id}/settings/tags/find`
+            )
+
+            let headers = {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Authorization": "Bearer " + token,
+            }
+
+            let body = {
+                term: phrase
+            }
+
+            const res = await fetch(url, {
+                method: "POST",
+                headers,
+                body: JSON.stringify(body)
+            })
+
+            const data = await res.json()
+            return data.data
+        },
+        async ADD_TAG ({}, tagName){
+            const token = localStorage.getItem('token')
+            const team_id = localStorage.getItem('teamId')
+
+            const url = new URL(
+                `https://api.itl.wiki/team/${team_id}/settings/tags/add`
+            )
+
+            let headers = {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Authorization": "Bearer " + token,
+            }
+
+            let body = {
+                name: tagName
+            }
+
+            const res = await fetch(url, {
+                method: "POST",
+                headers,
+                body: JSON.stringify(body)
+            })
+
+            const data = await res.json()
+            console.log(data)
         }
     }
 }

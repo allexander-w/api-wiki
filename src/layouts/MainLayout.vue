@@ -1,7 +1,9 @@
 <template>
     <div class="main-page">
         <Sidebar />
-        <router-view />
+        <div class="main-window">
+            <router-view />
+        </div>
     </div>
 </template>
 
@@ -16,7 +18,9 @@ export default {
 </script>
 
 <style lang="scss">
-
+.main-window {
+    overflow-x: auto;
+}
 .main-page {
     display: flex;
 }

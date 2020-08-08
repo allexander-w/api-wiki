@@ -18,18 +18,32 @@
                 Войти
             </button>
         </form>
+
+        <transition name="fade">
+            <Message :message='message' v-show='!status' />
+        </transition>
+
+        <Loader v-show='load' />
     </div>
 </template>
 
 <script>
 import { required, minLength, email } from 'vuelidate/lib/validators'
+import Message from '@/components/Message'
+import Loader from '@/components/Loader'
 
 export default {
     name: 'Auth',
     data: ()=> ({
+        message: 'Проверьте введенные данные',
+        load: false,
         email: '',
-        password: ''
+        password: '',
+        status: true
     }),
+    components: {
+        Message, Loader
+    },
     validations: {
         email: {required, email},
         password: {required, minLength: minLength(6)}
@@ -45,10 +59,23 @@ export default {
                 email: this.email,
                 password: this.password
             }
+            this.load = true
+            this.status = await this.$store.dispatch('SIGN_IN', formData)
 
-            await this.$store.dispatch('SIGN_IN', formData)
+            if (this.status) {
+                this.$router.push('/account')
+                this.load = false
+            } else {
+                this.load = false
+                setTimeout(()=> {
+                    this.status = true
+                }, 2500)
+            }
+
+            this.load = false
+
             
-            this.$router.push('/account')
+            
         }
     }
 }

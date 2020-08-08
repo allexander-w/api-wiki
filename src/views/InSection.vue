@@ -63,6 +63,11 @@ export default {
     async mounted(){
         await this.$store.dispatch('GET_INSECTION', this.$route.params.id)
     },
+    watch: {
+        async $route (to, from) {
+            await this.$store.dispatch('GET_INSECTION', this.$route.params.id)
+        }
+    },
     computed: {
         ...mapGetters (['INSECTION']),
     },
@@ -70,11 +75,13 @@ export default {
         async inFolder(id){
             this.$router.push(`/account/sections/${id}`)
             await this.$store.dispatch('GET_INSECTION', id)
+
         },
         async inArticle(id){
             console.log(this.$route.params.id)
             this.$router.push(`/account/sections/${this.$route.params.id}/articles/${id}`)
-        }
+        },
+        
     }
 }
 

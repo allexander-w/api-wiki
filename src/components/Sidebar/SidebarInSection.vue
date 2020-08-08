@@ -9,7 +9,7 @@
         </div>
         <div class="dropdown-open" v-show='isOpen'>
             <div class="search-dropdown">
-                <input type="text" class="dropdown-search" placeholder="Название раздела" v-model='search'> <span>x</span>
+                <input type="text" class="dropdown-search" placeholder="Введите название раздела" v-model='search'> <i v-if='search' @click='search = ""' class="fas fa-times clear-search"></i>
             </div>
             <div class="line"></div>
             <div class="allnonsorted-wrapper" v-if='!search'>
@@ -115,6 +115,11 @@ export default {
             })
         }
     },
+    watch: {
+        $route(to, from) {
+            this.updateSidebar()
+        }
+    },
     methods: {
         async openSidebarSection(id) {
             this.isOpen = !this.isOpen
@@ -196,7 +201,7 @@ export default {
 .line {
     width: 220px;
     height: 1px;
-    background-color: #999;
+    background-color: #e6effb;
 }
 .dropdown-search {
     width: 200px;
@@ -204,6 +209,8 @@ export default {
     border: none;
     outline: none;
     padding-left: 10px;
+
+    font-size: 14px;  
 }
 .dropdown-open {
     background-color: #fff;
@@ -244,6 +251,10 @@ export default {
             font-size: 14px;
         }
     } 
+}
+.clear-search {
+    color: #999;
+    cursor: pointer;
 }
 .sidebar-open {
     background-color: #fff;

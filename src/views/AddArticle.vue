@@ -1,6 +1,6 @@
 <template>
     <div class="add-doc">
-        <div class="error-popup" v-if='$v.title.$dirty && !$v.title.required'>
+        <div class="error-popup" v-if='($v.title.$dirty && !$v.title.required) || ($v.section.$dirty && !$v.section.required)'>
             <i class="fas fa-exclamation-triangle err-icon"></i>
            <p class="error-text">Не указан заголовок или раздел</p>
         </div>
@@ -147,6 +147,7 @@ export default {
         Loader, Editor
     },
     data: () => ({
+        validSection: false,
         searchSection: '',
         title: '',
         nowDate: '',
@@ -229,7 +230,8 @@ export default {
         }
     }),
     validations: {
-        title: {required}
+        title: {required},
+        section: {required}
     },
    
     directives: {
@@ -301,9 +303,7 @@ export default {
                 this.$v.$touch()
                 return
             }
-            if (this.section === ''){
-                return
-            } 
+           
             let action
             if (this.isRole) {
               action = 3  
@@ -324,8 +324,13 @@ export default {
                 "tags": this.currentTags
             } 
 
-            this.$store.dispatch('ADD_ARTICLE', body)
+            const stat = await this.$store.dispatch('ADD_ARTICLE', body)
 
+            if (stat.status === 'error') {
+                console.log('ERROR')
+                return
+            }
+            
             this.$router.push('/account')
         },
         async sidebarUpdate(){

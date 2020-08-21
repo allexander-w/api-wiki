@@ -27,19 +27,26 @@
         </button>
 
         <Loader v-show="load" />
+        <transition name="fade">
+            <Message :message='message' v-show='status' />
+        </transition>
     </div>
 </template>
 
 <script>
 import Select from '@/components/Select'
 import Loader from '@/components/Loader'
+import Message from '@/components/Message'
+
 export default {
     data: () => ({
         emails: '',
         attachable: 'admin',
-        load: false
+        load: false,
+        message: 'Проверьте введенные данные!',
+        status: false
     }), 
-    components: {Select, Loader},
+    components: {Select, Loader, Message},
     methods: {
         async addEmp(){
             const formData = {
@@ -49,10 +56,20 @@ export default {
             
             try {
                 this.load = true
-                await this.$store.dispatch('ADD_EMPLOYEE', formData)
+                const data = await this.$store.dispatch('ADD_EMPLOYEE', formData)
+                if (data.status === 'error') {
+                    this.load = false
+                    this.status = true
+
+                    setTimeout(()=> { this.status = !this.status }, 2500)
+                    this.emails = ''
+                    return
+                }
                 this.load=false
                 this.$router.push('/account/employees')
-            } catch (e) {this.load=false}
+            } catch (e) {
+                this.load=false
+            }
         },
         getRole(data) {
             this.attachable = data

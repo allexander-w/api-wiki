@@ -46,7 +46,8 @@ p {
   color: #0e65dd;
 }
 .container {
-  width: 1300px;
+  max-width: 1300px;
+  padding: 0 10px;
   margin: 0 auto; 
 }
 .p-desc {

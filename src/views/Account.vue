@@ -76,7 +76,8 @@ export default {
 .account {
     background-color: #f1f6fd;
     padding: 50px 0 0 50px;
-    width: 100%;
+    width: calc(100vw - 80px);
+    height: 100vh;
 }
 .aa {
     margin-bottom: 800px;

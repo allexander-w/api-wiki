@@ -230,9 +230,7 @@ export default {
                 this.$v.$touch()
                 return
             }
-            if (this.section === ''){
-                return
-            } 
+           
             const editorData = await this.$refs.editor.state.editor.save()
             
             const formData = {

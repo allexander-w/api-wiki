@@ -40,13 +40,13 @@ export default {
                 attachable
             }
 
-            const res = await fetch(url, {
+            const data = await ( await fetch(url, {
                 method: "POST",
                 headers,
                 body: JSON.stringify(body)
-            })
+            })).json()
             
-            const data = await res.json()
+            return data
         },
         async GET_EMPLOYEES({dispatch}){
             const team_id = localStorage.getItem('teamId')

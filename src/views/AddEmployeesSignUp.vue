@@ -18,17 +18,28 @@
                 Пропустить
             </button>
         </div>
+
+        <Loader v-show="load" />
+        <transition name="fade">
+            <Message :message='message' v-show='status' />
+        </transition>
     </div>
 </template>
 
 <script>
 import Select from '@/components/Select'
+import Message from '@/components/Message'
+import Loader from '@/components/Loader'
+
 export default {
     data: () => ({
         emails: '',
         attachable: 'admin',
+        message: 'Введите корректные данные',
+        status: false,
+        load: false
     }), 
-    components: {Select},
+    components: {Select, Message, Loader},
     methods: {
         skipInvite(){
             this.$router.push('/account')
@@ -40,8 +51,18 @@ export default {
             }
             
             try {
-                await this.$store.dispatch('ADD_EMPLOYEE', formData)
+                this.load = true
+                const data = await this.$store.dispatch('ADD_EMPLOYEE', formData)
+                if (data.status === 'error') {
+                    this.load = false
+                    this.status = true
+
+                    setTimeout(()=> { this.status = !this.status }, 2500)
+                    this.emails = ''
+                    return
+                }
                 localStorage.removeItem('teamId')
+                this.load = false
                 this.$router.push('/account')
             } catch (e) {}
         },

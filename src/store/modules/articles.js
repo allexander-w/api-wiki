@@ -1,3 +1,4 @@
+
 export default {
     state: {
         article: {}
@@ -27,13 +28,13 @@ export default {
                 "Authorization": "Bearer " + token
             }
 
-            fetch(url, {
+            const res = await (await fetch(url, {
                 method: "POST",
                 headers: headers,
                 body: JSON.stringify(body)
-            })
-                .then(response => response.json())
-                .then(json => console.log(json));
+            })).json()
+            
+            return res
         },
         async GET_WORKS({}){
             const token = localStorage.getItem('token')
